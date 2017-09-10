@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var rotateLabel: UILabel!
     @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var rotationImageInstruction: UIImageView!
     
     var rotationSelection: Int = Int()  // generated in ViewDidLoad
     
@@ -105,10 +106,13 @@ class ViewController: UIViewController {
         rotationSelection = randomNumber     // this sets var rotation to an integer used in func StartAlarm
         if randomNumber == 0 {
             aroundAxis = "around PITCH axis (forward/ backward)"
+            rotationImageInstruction.image = UIImage(named: "pitchAxis")
         } else if randomNumber == 1 {
             aroundAxis = "around ROLL axis (left/ right)"
+            rotationImageInstruction.image = UIImage(named: "rollAxis")
         } else {
             aroundAxis = "around YAW axis (clockwise/ counterclockwise)"
+            rotationImageInstruction.image = UIImage(named: "yawAxis")
         }
         
         rotateLabel.text = "Rotate phone \(aroundAxis) to turn off alarm"

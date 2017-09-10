@@ -10,12 +10,22 @@
 
 import UIKit
 
+// for accessing CoreMotion data
 import CoreMotion
 
+// for playing audio files
+import AVFoundation
+
+
 class ViewController: UIViewController {
-    // Shantini
+//- Core Motion declaration
     var motionManager: CMMotionManager?
-    var expected:[Double] = [100, 60, 60]
+    
+//- Set minumum rotation rate for turning off alarm [x, y, z] units of radians/second
+    var expected:[Double] = [60, 60, 60]
+    
+//- Audio player declaration
+    var audioPlayer = AVAudioPlayer()
     
     @IBOutlet weak var rotateLabel: UILabel!
     @IBOutlet weak var display: UILabel!
@@ -24,7 +34,7 @@ class ViewController: UIViewController {
     var rotationSelection: Int = Int()  // generated in ViewDidLoad
     
     
-    // Shantini
+//- StartAlarm
     func StartAlarm(Manager: CMMotionManager, Expected: [Double]){
         let myq = OperationQueue() //declares a new queue
         var count = 0
@@ -62,6 +72,7 @@ class ViewController: UIViewController {
                 if count > 10{
                     print("YAY!")
                     self.rotateLabel.text = "G O O D   M O R N I N G"
+                    self.audioPlayer.pause()
                     Manager.stopDeviceMotionUpdates()
                 }
             }
@@ -73,7 +84,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Shantini
+//----- Start collecting motion data on load
         motionManager = CMMotionManager()
         if let manager = motionManager {
             print("We have a motion manager \(manager)")
@@ -92,7 +103,7 @@ class ViewController: UIViewController {
         }
         else { print("No manager") }
         
-        // Programmatically create red gradient background
+//----- Gradient background created programmatically
         let gradient: CAGradientLayer = CAGradientLayer()
         gradient.frame = self.view.bounds
         gradient.colors = [UIColor( red:0.557, green:0.000, blue:0.000, alpha:1.000).cgColor,UIColor( red:1.000, green:0.000, blue:0.000, alpha:1.000).cgColor]
@@ -100,7 +111,7 @@ class ViewController: UIViewController {
         gradient.endPoint = CGPoint(x: 0.5, y: 1.0)
         self.view.layer.insertSublayer(gradient, at: 0)
         
-        // randomly select rotation axis on load
+//----- randomly select rotation axis on load
         let randomNumber = Int(arc4random_uniform(3))
         var aroundAxis: String = ""
         rotationSelection = randomNumber     // this sets var rotation to an integer used in func StartAlarm
@@ -115,7 +126,30 @@ class ViewController: UIViewController {
             rotationImageInstruction.image = UIImage(named: "yawAxis")
         }
         
+//----- Display instructions in label on UI
         rotateLabel.text = "Rotate phone \(aroundAxis) to turn off alarm"
+        
+//----- Auto-play audio on load
+        do{
+            audioPlayer = try AVAudioPlayer(contentsOf: URL.init(fileURLWithPath: Bundle.main.path(forResource: "algo_alarm", ofType: "mp3")!))
+            audioPlayer.prepareToPlay()
+            
+            audioPlayer.numberOfLoops = -1
+            audioPlayer.play()
+            
+            let audioSession = AVAudioSession.sharedInstance()
+            
+            do{
+                try audioSession.setCategory(AVAudioSessionCategoryPlayback)
+            }
+            catch{
+                //
+            }
+        }
+        catch {
+            print(error)
+        }
+
         
     }
     
